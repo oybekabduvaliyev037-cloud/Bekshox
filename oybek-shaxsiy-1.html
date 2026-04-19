@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shaxsiy Sahifa</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0f;
+  --surface:#13131a;
+  --surface2:#1c1c26;
+  --border:#2a2a3a;
+  --gold:#c9a84c;
+  --gold2:#e8c97a;
+  --white:#f0ede8;
+  --gray:#6b7280;
+  --danger:#e05555;
+  --success:#4caf76;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;}
+
+/* ── LOGIN ── */
+#loginScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  background-image:radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.06) 0%, transparent 60%),
+                   radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.04) 0%, transparent 50%);
+}
+.login-box{
+  width:100%;max-width:380px;padding:3rem 2.5rem;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  animation:fadeUp 0.5s ease;
+}
+.login-icon{
+  width:60px;height:60px;
+  background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.05));
+  border:1px solid rgba(201,168,76,0.3);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin:0 auto 1.5rem;
+}
+.login-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.6rem;text-align:center;color:var(--white);margin-bottom:0.4rem;
+}
+.login-sub{text-align:center;color:var(--gray);font-size:0.85rem;margin-bottom:2rem;}
+.input-wrap{position:relative;margin-bottom:1rem;}
+.input-wrap input{
+  width:100%;padding:0.85rem 3rem 0.85rem 1rem;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:5px;
+  color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.95rem;
+  outline:none;transition:border-color 0.2s;
+}
+.input-wrap input:focus{border-color:var(--gold);}
+.input-wrap input::placeholder{color:var(--gray);}
+.eye-btn{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:1rem;color:var(--gray);
+  transition:color 0.2s;
+}
+.eye-btn:hover{color:var(--gold);}
+.login-btn{
+  width:100%;padding:0.9rem;
+  background:var(--gold);color:#0a0a0f;
+  font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:600;
+  border:none;border-radius:5px;cursor:pointer;
+  transition:background 0.2s,transform 0.1s;margin-top:0.5rem;
+}
+.login-btn:hover{background:var(--gold2);transform:translateY(-1px);}
+.login-btn:active{transform:translateY(0);}
+.error-msg{
+  text-align:center;color:var(--danger);font-size:0.82rem;
+  margin-top:0.8rem;min-height:1.2rem;
+}
+.shake{animation:shake 0.4s ease;}
+
+/* ── APP ── */
+#app{display:none;min-height:100vh;}
+
+/* TOP BAR */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1rem 2rem;
+  background:rgba(10,10,15,0.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.topbar-logo{
+  font-family:'Playfair Display',serif;font-size:1.2rem;
+  color:var(--white);
+}
+.topbar-logo span{color:var(--gold);}
+.topbar-right{display:flex;align-items:center;gap:1rem;}
+.topbar-user{
+  display:flex;align-items:center;gap:0.6rem;
+  font-size:0.85rem;color:var(--gray);
+}
+.avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:700;color:#0a0a0f;
+}
+.logout-btn{
+  padding:0.4rem 1rem;background:transparent;
+  border:1px solid var(--border);border-radius:4px;
+  color:var(--gray);font-size:0.8rem;cursor:pointer;
+  transition:border-color 0.2s,color 0.2s;
+}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger);}
+
+/* MAIN LAYOUT */
+.main{display:flex;min-height:calc(100vh - 61px);}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;flex-shrink:0;
+  padding:1.5rem 1rem;
+  border-right:1px solid var(--border);
+  background:var(--surface);
+}
+.sidebar-section{margin-bottom:2rem;}
+.sidebar-label{
+  font-size:0.68rem;font-weight:600;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--gray);
+  padding:0 0.5rem;margin-bottom:0.6rem;
+}
+.nav-item{
+  display:flex;align-items:center;gap:0.7rem;
+  padding:0.6rem 0.8rem;border-radius:5px;
+  cursor:pointer;font-size:0.88rem;color:var(--gray);
+  transition:background 0.15s,color 0.15s;
+  margin-bottom:2px;
+}
+.nav-item:hover{background:var(--surface2);color:var(--white);}
+.nav-item.active{background:rgba(201,168,76,0.12);color:var(--gold);}
+.nav-icon{font-size:1rem;width:20px;text-align:center;}
+.nav-count{
+  margin-left:auto;background:var(--surface2);
+  border-radius:10px;padding:1px 7px;font-size:0.72rem;
+  color:var(--gray);
+}
+
+/* CONTENT */
+.content{flex:1;padding:2rem;overflow-y:auto;}
+
+/* PANELS */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* PAGE HEADER */
+.page-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:2rem;
+}
+.page-title{font-family:'Playfair Display',serif;font-size:1.6rem;}
+.add-btn{
+  display:flex;align-items:center;gap:0.5rem;
+  padding:0.6rem 1.2rem;
+  background:var(--gold);color:#0a0a0f;
+  font-size:0.85rem;font-weight:600;
+  border:none;border-radius:5px;cursor:pointer;
+  transition:background 0.2s;
+}
+.add-btn:hover{background:var(--gold2);}
+
+/* UPLOAD ZONE */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:8px;
+  padding:2.5rem;text-align:center;
+  cursor:pointer;transition:border-color 0.2s,background 0.2s;
+  margin-bottom:2rem;
+}
+.upload-zone:hover{border-color:var(--gold);background:rgba(201,168,76,0.04);}
+.upload-zone input{display:none;}
+.upload-icon{font-size:2rem;margin-bottom:0.8rem;}
+.upload-zone p{color:var(--gray);font-size:0.88rem;}
+.upload-zone strong{color:var(--gold);}
+
+/* MEDIA GRID */
+.media-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:1rem;
+}
+.media-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;overflow:hidden;
+  transition:border-color 0.2s,transform 0.2s;
+  cursor:pointer;
+}
+.media-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.media-thumb{
+  width:100%;aspect-ratio:4/3;object-fit:cover;display:block;
+  background:var(--surface2);
+}
+.media-thumb-video{
+  width:100%;aspect-ratio:4/3;
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;color:var(--gold);
+}
+.media-info{padding:0.7rem;}
+.media-name{
+  font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:var(--white);
+}
+.media-meta{font-size:0.7rem;color:var(--gray);margin-top:2px;}
+.media-actions{
+  display:flex;gap:0.4rem;margin-top:0.5rem;
+}
+.media-del{
+  padding:3px 8px;background:transparent;
+  border:1px solid var(--border);border-radius:3px;
+  color:var(--danger);font-size:0.72rem;cursor:pointer;
+  transition:background 0.15s;
+}
+.media-del:hover{background:rgba(224,85,85,0.1);}
+
+/* NOTES */
+.notes-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1rem;margin-bottom:2rem;
+}
+.note-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:1.2rem;
+  transition:border-color 0.2s;
+}
+.note-card:hover{border-color:var(--gold);}
+.note-title{font-weight:600;font-size:0.95rem;margin-bottom:0.5rem;}
+.note-body{font-size:0.85rem;color:var(--gray);line-height:1.6;white-space:pre-wrap;}
+.note-date{font-size:0.72rem;color:var(--border);margin-top:0.8rem;}
+.note-actions{display:flex;gap:0.4rem;margin-top:0.8rem;}
+.note-edit{
+  padding:3px 8px;background:transparent;
+  border:1px solid var(--border);border-radius:3px;
+  color:var(--gold);font-size:0.72rem;cursor:pointer;
+}
+.note-del{
+  padding:3px 8px;background:transparent;
+  border:1px solid var(--border);border-radius:3px;
+  color:var(--danger);font-size:0.72rem;cursor:pointer;
+}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);
+  z-index:200;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:2rem;width:100%;max-width:480px;
+  animation:fadeUp 0.3s ease;
+}
+.modal h3{
+  font-family:'Playfair Display',serif;font-size:1.3rem;
+  margin-bottom:1.5rem;
+}
+.form-group{margin-bottom:1rem;}
+.form-group label{
+  display:block;font-size:0.78rem;font-weight:600;
+  letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--gray);margin-bottom:0.4rem;
+}
+.form-group input,.form-group textarea{
+  width:100%;padding:0.75rem 1rem;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:5px;color:var(--white);
+  font-family:'DM Sans',sans-serif;font-size:0.92rem;outline:none;
+  transition:border-color 0.2s;
+}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--gold);}
+.form-group textarea{min-height:140px;resize:vertical;}
+.modal-btns{display:flex;gap:0.8rem;justify-content:flex-end;margin-top:1.5rem;}
+.btn-cancel{
+  padding:0.6rem 1.4rem;background:transparent;
+  border:1px solid var(--border);border-radius:5px;
+  color:var(--gray);cursor:pointer;font-size:0.88rem;
+}
+.btn-save{
+  padding:0.6rem 1.4rem;background:var(--gold);
+  border:none;border-radius:5px;
+  color:#0a0a0f;font-weight:600;cursor:pointer;font-size:0.88rem;
+}
+
+/* VIEWER */
+.viewer-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.92);z-index:300;
+  align-items:center;justify-content:center;flex-direction:column;
+}
+.viewer-overlay.open{display:flex;}
+.viewer-overlay img,.viewer-overlay video{
+  max-width:90vw;max-height:85vh;border-radius:6px;
+}
+.viewer-close{
+  position:absolute;top:1.5rem;right:1.5rem;
+  background:rgba(255,255,255,0.1);border:none;
+  border-radius:50%;width:40px;height:40px;
+  color:var(--white);font-size:1.2rem;cursor:pointer;
+}
+
+/* EMPTY STATE */
+.empty{
+  text-align:center;padding:4rem 2rem;
+  color:var(--gray);
+}
+.empty-icon{font-size:3rem;margin-bottom:1rem;opacity:0.4;}
+.empty p{font-size:0.9rem;}
+
+/* STATS */
+.stats-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1rem;margin-bottom:2.5rem;
+}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:1.2rem 1.5rem;
+}
+.stat-card .s-label{font-size:0.75rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;}
+.stat-card .s-val{
+  font-family:'Playfair Display',serif;font-size:2rem;
+  color:var(--gold);margin-top:0.3rem;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .content{padding:1rem;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .topbar{padding:0.8rem 1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <h2 class="login-title">Shaxsiy Sahifa</h2>
+    <p class="login-sub">Kirish uchun parolingizni yozing</p>
+    <div class="input-wrap">
+      <input type="password" id="pwInput" placeholder="Parol..." onkeydown="if(event.key==='Enter')tryLogin()"/>
+      <button class="eye-btn" onclick="toggleEye()" id="eyeBtn">👁</button>
+    </div>
+    <button class="login-btn" onclick="tryLogin()">Kirish</button>
+    <p class="error-msg" id="errMsg"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">Oybek<span>.</span>Vault</div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <div class="avatar">O</div>
+        <span>Oybek</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">Chiqish</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Asosiy</div>
+        <div class="nav-item active" onclick="showPanel('home',this)">
+          <span class="nav-icon">🏠</span> Bosh sahifa
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Saqlash</div>
+        <div class="nav-item" onclick="showPanel('images',this)">
+          <span class="nav-icon">🖼</span> Rasmlar
+          <span class="nav-count" id="imgCount">0</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('videos',this)">
+          <span class="nav-icon">🎬</span> Videolar
+          <span class="nav-count" id="vidCount">0</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('notes',this)">
+          <span class="nav-icon">📝</span> Matnlar
+          <span class="nav-count" id="noteCount">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- HOME -->
+      <div class="panel active" id="panel-home">
+        <div class="page-header">
+          <h2 class="page-title">Xush kelibsiz, Oybek! 👋</h2>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="s-label">Rasmlar</div>
+            <div class="s-val" id="homeImgCount">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">Videolar</div>
+            <div class="s-val" id="homeVidCount">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">Matnlar</div>
+            <div class="s-val" id="homeNoteCount">0</div>
+          </div>
+        </div>
+        <p style="color:var(--gray);font-size:0.9rem;line-height:1.8;">
+          Bu sizning shaxsiy xavfsiz saqlagichingiz. Chap menyu orqali rasm, video va matnlarni saqlang. Barcha ma'lumotlar faqat sizning qurilmangizda saqlanadi.
+        </p>
+      </div>
+
+      <!-- IMAGES -->
+      <div class="panel" id="panel-images">
+        <div class="page-header">
+          <h2 class="page-title">Rasmlar 🖼</h2>
+        </div>
+        <label class="upload-zone" id="imgZone">
+          <input type="file" accept="image/*" multiple onchange="handleImages(this.files)"/>
+          <div class="upload-icon">📤</div>
+          <p><strong>Bosing yoki suring</strong> — rasm yuklash</p>
+          <p style="margin-top:4px;font-size:0.78rem;">JPG, PNG, GIF, WEBP</p>
+        </label>
+        <div class="media-grid" id="imgGrid"></div>
+        <div class="empty" id="imgEmpty">
+          <div class="empty-icon">🖼</div>
+          <p>Hali rasm yo'q. Yuqoridagi zona orqali qo'shing.</p>
+        </div>
+      </div>
+
+      <!-- VIDEOS -->
+      <div class="panel" id="panel-videos">
+        <div class="page-header">
+          <h2 class="page-title">Videolar 🎬</h2>
+        </div>
+        <label class="upload-zone" id="vidZone">
+          <input type="file" accept="video/*" multiple onchange="handleVideos(this.files)"/>
+          <div class="upload-icon">📤</div>
+          <p><strong>Bosing yoki suring</strong> — video yuklash</p>
+          <p style="margin-top:4px;font-size:0.78rem;">MP4, MOV, AVI, WEBM</p>
+        </label>
+        <div class="media-grid" id="vidGrid"></div>
+        <div class="empty" id="vidEmpty">
+          <div class="empty-icon">🎬</div>
+          <p>Hali video yo'q. Yuqoridagi zona orqali qo'shing.</p>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="panel" id="panel-notes">
+        <div class="page-header">
+          <h2 class="page-title">Matnlar 📝</h2>
+          <button class="add-btn" onclick="openNoteModal()">＋ Yangi matn</button>
+        </div>
+        <div class="notes-grid" id="notesGrid"></div>
+        <div class="empty" id="notesEmpty">
+          <div class="empty-icon">📝</div>
+          <p>Hali matn yo'q. "Yangi matn" tugmasini bosing.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal">
+    <h3 id="modalTitle">Yangi Matn</h3>
+    <div class="form-group">
+      <label>Sarlavha</label>
+      <input type="text" id="noteTitle" placeholder="Sarlavha..."/>
+    </div>
+    <div class="form-group">
+      <label>Matn</label>
+      <textarea id="noteBody" placeholder="Bu yerga yozing..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeNoteModal()">Bekor</button>
+      <button class="btn-save" onclick="saveNote()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEWER -->
+<div class="viewer-overlay" id="viewer" onclick="closeViewer()">
+  <button class="viewer-close" onclick="closeViewer()">✕</button>
+  <div id="viewerContent"></div>
+</div>
+
+<script>
+const PASSWORD = 'Bekshox1998a';
+let images = JSON.parse(localStorage.getItem('ov_images')||'[]');
+let videos = JSON.parse(localStorage.getItem('ov_videos')||'[]');
+let notes  = JSON.parse(localStorage.getItem('ov_notes') ||'[]');
+let editingNoteId = null;
+
+// ── AUTH ──
+function tryLogin(){
+  const val = document.getElementById('pwInput').value;
+  const err = document.getElementById('errMsg');
+  if(val === PASSWORD){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+    renderAll();
+  } else {
+    err.textContent='Parol noto\'g\'ri! Qayta urinib ko\'ring.';
+    document.querySelector('.login-box').classList.remove('shake');
+    void document.querySelector('.login-box').offsetWidth;
+    document.querySelector('.login-box').classList.add('shake');
+    setTimeout(()=>document.querySelector('.login-box').classList.remove('shake'),400);
+  }
+}
+function logout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('pwInput').value='';
+  document.getElementById('errMsg').textContent='';
+}
+function toggleEye(){
+  const inp=document.getElementById('pwInput');
+  const btn=document.getElementById('eyeBtn');
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
+}
+
+// ── NAVIGATION ──
+function showPanel(name, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── IMAGES ──
+function handleImages(files){
+  Array.from(files).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      images.push({id:Date.now()+Math.random(),name:file.name,data:e.target.result,date:new Date().toLocaleDateString('uz-UZ')});
+      save(); renderImages();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function renderImages(){
+  const grid=document.getElementById('imgGrid');
+  const empty=document.getElementById('imgEmpty');
+  document.getElementById('imgCount').textContent=images.length;
+  document.getElementById('homeImgCount').textContent=images.length;
+  if(!images.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=images.map(img=>`
+    <div class="media-card">
+      <img class="media-thumb" src="${img.data}" onclick="viewImg('${img.id}')" alt="${img.name}"/>
+      <div class="media-info">
+        <div class="media-name">${img.name}</div>
+        <div class="media-meta">${img.date}</div>
+        <div class="media-actions">
+          <button class="media-del" onclick="delImage('${img.id}')">🗑 O'chirish</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function delImage(id){
+  if(!confirm('Bu rasmni o\'chirasizmi?'))return;
+  images=images.filter(i=>i.id!=id);save();renderImages();
+}
+function viewImg(id){
+  const img=images.find(i=>i.id==id);
+  document.getElementById('viewerContent').innerHTML=`<img src="${img.data}" alt="${img.name}"/>`;
+  document.getElementById('viewer').classList.add('open');
+}
+
+// ── VIDEOS ──
+function handleVideos(files){
+  Array.from(files).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      videos.push({id:Date.now()+Math.random(),name:file.name,data:e.target.result,date:new Date().toLocaleDateString('uz-UZ')});
+      save();renderVideos();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function renderVideos(){
+  const grid=document.getElementById('vidGrid');
+  const empty=document.getElementById('vidEmpty');
+  document.getElementById('vidCount').textContent=videos.length;
+  document.getElementById('homeVidCount').textContent=videos.length;
+  if(!videos.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=videos.map(vid=>`
+    <div class="media-card">
+      <div class="media-thumb-video" onclick="viewVid('${vid.id}')">▶</div>
+      <div class="media-info">
+        <div class="media-name">${vid.name}</div>
+        <div class="media-meta">${vid.date}</div>
+        <div class="media-actions">
+          <button class="media-del" onclick="delVideo('${vid.id}')">🗑 O'chirish</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function delVideo(id){
+  if(!confirm('Bu videoni o\'chirasizmi?'))return;
+  videos=videos.filter(v=>v.id!=id);save();renderVideos();
+}
+function viewVid(id){
+  const vid=videos.find(v=>v.id==id);
+  document.getElementById('viewerContent').innerHTML=`<video src="${vid.data}" controls autoplay style="max-width:90vw;max-height:80vh;"></video>`;
+  document.getElementById('viewer').classList.add('open');
+}
+
+// ── NOTES ──
+function openNoteModal(id){
+  editingNoteId=id||null;
+  document.getElementById('modalTitle').textContent=id?'Matnni tahrirlash':'Yangi Matn';
+  if(id){
+    const n=notes.find(n=>n.id==id);
+    document.getElementById('noteTitle').value=n.title;
+    document.getElementById('noteBody').value=n.body;
+  } else {
+    document.getElementById('noteTitle').value='';
+    document.getElementById('noteBody').value='';
+  }
+  document.getElementById('noteModal').classList.add('open');
+}
+function closeNoteModal(){document.getElementById('noteModal').classList.remove('open');}
+function saveNote(){
+  const title=document.getElementById('noteTitle').value.trim()||'Sarlavsiz';
+  const body=document.getElementById('noteBody').value.trim();
+  if(!body)return;
+  if(editingNoteId){
+    const n=notes.find(n=>n.id==editingNoteId);
+    n.title=title;n.body=body;
+  } else {
+    notes.push({id:Date.now(),title,body,date:new Date().toLocaleDateString('uz-UZ')});
+  }
+  save();renderNotes();closeNoteModal();
+}
+function renderNotes(){
+  const grid=document.getElementById('notesGrid');
+  const empty=document.getElementById('notesEmpty');
+  document.getElementById('noteCount').textContent=notes.length;
+  document.getElementById('homeNoteCount').textContent=notes.length;
+  if(!notes.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=notes.map(n=>`
+    <div class="note-card">
+      <div class="note-title">${n.title}</div>
+      <div class="note-body">${n.body.substring(0,200)}${n.body.length>200?'...':''}</div>
+      <div class="note-date">${n.date}</div>
+      <div class="note-actions">
+        <button class="note-edit" onclick="openNoteModal(${n.id})">✏ Tahrirlash</button>
+        <button class="note-del" onclick="delNote(${n.id})">🗑 O'chirish</button>
+      </div>
+    </div>`).join('');
+}
+function delNote(id){
+  if(!confirm('Bu matnni o\'chirasizmi?'))return;
+  notes=notes.filter(n=>n.id!=id);save();renderNotes();
+}
+
+// ── VIEWER ──
+function closeViewer(){
+  document.getElementById('viewer').classList.remove('open');
+  document.getElementById('viewerContent').innerHTML='';
+}
+
+// ── STORAGE ──
+function save(){
+  localStorage.setItem('ov_images',JSON.stringify(images));
+  localStorage.setItem('ov_videos',JSON.stringify(videos));
+  localStorage.setItem('ov_notes',JSON.stringify(notes));
+}
+function renderAll(){renderImages();renderVideos();renderNotes();}
+
+// Drag & drop
+['imgZone','vidZone'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('dragover',e=>{e.preventDefault();el.style.borderColor='var(--gold)';});
+  el.addEventListener('dragleave',()=>el.style.borderColor='');
+  el.addEventListener('drop',e=>{
+    e.preventDefault();el.style.borderColor='';
+    const files=e.dataTransfer.files;
+    if(id==='imgZone') handleImages(files);
+    else handleVideos(files);
+  });
+});
+</script>
+</body>
+</html>
