@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Oybek.Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c26;
+  --border:#2a2a3a;--gold:#c9a84c;--gold2:#e8c97a;
+  --white:#f0ede8;--gray:#6b7280;--danger:#e05555;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;}
+
+/* LOGIN */
+#loginScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  background-image:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,0.08) 0%,transparent 60%);
+}
+.login-box{
+  width:100%;max-width:360px;padding:2.5rem 2rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  animation:fadeUp 0.5s ease;
+}
+.login-icon{font-size:2.5rem;text-align:center;margin-bottom:1rem;}
+.login-title{font-family:'Playfair Display',serif;font-size:1.5rem;text-align:center;margin-bottom:0.3rem;}
+.login-sub{text-align:center;color:var(--gray);font-size:0.82rem;margin-bottom:1.8rem;}
+.pw-wrap{position:relative;}
+.pw-wrap input{
+  width:100%;padding:0.85rem 3rem 0.85rem 1rem;
+  background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+  color:var(--white);font-size:0.95rem;font-family:'DM Sans',sans-serif;outline:none;
+  transition:border-color 0.2s;
+}
+.pw-wrap input:focus{border-color:var(--gold);}
+.pw-wrap input::placeholder{color:var(--gray);}
+.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:1rem;color:var(--gray);}
+.login-btn{
+  width:100%;margin-top:1rem;padding:0.9rem;
+  background:var(--gold);color:#0a0a0f;font-weight:700;font-size:0.95rem;
+  border:none;border-radius:6px;cursor:pointer;transition:background 0.2s;
+}
+.login-btn:hover{background:var(--gold2);}
+.err{color:#e05555;font-size:0.8rem;text-align:center;margin-top:0.6rem;min-height:1rem;}
+.shake{animation:shake 0.4s ease;}
+
+/* APP */
+#app{display:none;}
+
+/* TOPBAR */
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1rem 1.2rem;
+  background:rgba(10,10,15,0.95);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;
+}
+.logo{font-family:'Playfair Display',serif;font-size:1.2rem;}
+.logo span{color:var(--gold);}
+.topbar-right{display:flex;align-items:center;gap:0.8rem;}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:700;color:#0a0a0f;}
+.logout-btn{
+  padding:0.35rem 0.9rem;background:transparent;
+  border:1px solid var(--border);border-radius:4px;
+  color:var(--gray);font-size:0.78rem;cursor:pointer;
+}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger);}
+
+/* TABS */
+.tabs{
+  display:flex;gap:0;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  overflow-x:auto;
+}
+.tab{
+  padding:0.9rem 1.2rem;font-size:0.85rem;color:var(--gray);
+  cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;
+  transition:color 0.2s,border-color 0.2s;
+}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-count{
+  background:var(--surface2);border-radius:10px;
+  padding:1px 6px;font-size:0.7rem;margin-left:4px;
+}
+
+/* CONTENT */
+.content{padding:1.2rem;max-width:900px;margin:0 auto;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin-bottom:1.5rem;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem;}
+.stat-label{font-size:0.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;}
+.stat-val{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);margin-top:0.2rem;}
+
+/* UPLOAD */
+.upload-area{
+  border:2px dashed var(--border);border-radius:10px;
+  padding:2rem;text-align:center;cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;margin-bottom:1.2rem;
+  position:relative;
+}
+.upload-area:hover{border-color:var(--gold);background:rgba(201,168,76,0.03);}
+.upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:1.8rem;margin-bottom:0.5rem;}
+.upload-area p{color:var(--gray);font-size:0.85rem;}
+.upload-area strong{color:var(--gold);}
+
+/* GRID */
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.8rem;}
+.media-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;transition:border-color 0.2s,transform 0.15s;
+}
+.media-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.media-thumb{width:100%;aspect-ratio:1;object-fit:cover;display:block;cursor:pointer;}
+.media-thumb-vid{
+  width:100%;aspect-ratio:1;background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;cursor:pointer;
+}
+.media-info{padding:0.6rem;}
+.media-name{font-size:0.75rem;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.media-date{font-size:0.65rem;color:var(--gray);margin-top:2px;}
+.del-btn{
+  width:100%;margin-top:0.4rem;padding:0.3rem;
+  background:transparent;border:1px solid var(--border);border-radius:4px;
+  color:var(--danger);font-size:0.7rem;cursor:pointer;
+}
+.del-btn:hover{background:rgba(224,85,85,0.1);}
+
+/* NOTES */
+.add-note-btn{
+  display:flex;align-items:center;gap:0.5rem;
+  padding:0.65rem 1.2rem;background:var(--gold);color:#0a0a0f;
+  font-weight:700;font-size:0.85rem;border:none;border-radius:6px;
+  cursor:pointer;margin-bottom:1.2rem;
+}
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.8rem;}
+.note-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:1rem;transition:border-color 0.2s;
+}
+.note-card:hover{border-color:var(--gold);}
+.note-title{font-weight:600;font-size:0.92rem;margin-bottom:0.4rem;}
+.note-body{font-size:0.82rem;color:var(--gray);line-height:1.6;white-space:pre-wrap;
+  max-height:100px;overflow:hidden;}
+.note-date{font-size:0.68rem;color:var(--border);margin-top:0.6rem;}
+.note-btns{display:flex;gap:0.4rem;margin-top:0.6rem;}
+.note-edit{padding:3px 8px;background:transparent;border:1px solid var(--border);
+  border-radius:3px;color:var(--gold);font-size:0.7rem;cursor:pointer;}
+.note-del{padding:3px 8px;background:transparent;border:1px solid var(--border);
+  border-radius:3px;color:var(--danger);font-size:0.7rem;cursor:pointer;}
+
+/* EMPTY */
+.empty{text-align:center;padding:3rem 1rem;color:var(--gray);}
+.empty-icon{font-size:2.5rem;margin-bottom:0.8rem;opacity:0.4;}
+
+/* MODAL */
+.modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);
+  z-index:200;align-items:center;justify-content:center;padding:1rem;
+}
+.modal-bg.open{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:1.5rem;width:100%;max-width:440px;animation:fadeUp 0.3s ease;
+}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1.2rem;}
+.f-group{margin-bottom:0.9rem;}
+.f-group label{display:block;font-size:0.75rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.06em;color:var(--gray);margin-bottom:0.3rem;}
+.f-group input,.f-group textarea{
+  width:100%;padding:0.7rem 0.9rem;
+  background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+  color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;
+  transition:border-color 0.2s;
+}
+.f-group input:focus,.f-group textarea:focus{border-color:var(--gold);}
+.f-group textarea{min-height:120px;resize:vertical;}
+.modal-btns{display:flex;gap:0.6rem;justify-content:flex-end;margin-top:1.2rem;}
+.btn-cancel{padding:0.6rem 1.2rem;background:transparent;border:1px solid var(--border);
+  border-radius:6px;color:var(--gray);cursor:pointer;font-size:0.85rem;}
+.btn-save{padding:0.6rem 1.2rem;background:var(--gold);border:none;
+  border-radius:6px;color:#0a0a0f;font-weight:700;cursor:pointer;font-size:0.85rem;}
+
+/* VIEWER */
+.viewer-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);
+  z-index:300;align-items:center;justify-content:center;
+}
+.viewer-bg.open{display:flex;}
+.viewer-bg img,.viewer-bg video{max-width:95vw;max-height:88vh;border-radius:6px;}
+.viewer-close{
+  position:absolute;top:1rem;right:1rem;
+  background:rgba(255,255,255,0.15);border:none;border-radius:50%;
+  width:36px;height:36px;color:var(--white);font-size:1rem;cursor:pointer;
+}
+
+/* TOAST */
+#toast{
+  display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  background:var(--surface);border:1px solid var(--gold);color:var(--white);
+  padding:0.65rem 1.3rem;border-radius:6px;font-size:0.85rem;z-index:9999;
+  white-space:nowrap;
+}
+
+/* PROGRESS */
+#progress{
+  display:none;position:fixed;bottom:4rem;left:50%;transform:translateX(-50%);
+  background:var(--surface);border:1px solid var(--border);
+  padding:0.8rem 1.5rem;border-radius:8px;font-size:0.85rem;
+  color:var(--white);z-index:9999;text-align:center;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%,75%{transform:translateX(-7px);}50%{transform:translateX(7px);}}
+
+@media(max-width:500px){
+  .stats{grid-template-columns:repeat(3,1fr);}
+  .stat-val{font-size:1.4rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <h2 class="login-title">Oybek.Vault</h2>
+    <p class="login-sub">Shaxsiy sahifangizga kirish</p>
+    <div class="pw-wrap">
+      <input type="password" id="pwInput" placeholder="Parolni kiriting..." onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button class="eye" onclick="togglePw()" id="eyeBtn">👁</button>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Kirish →</button>
+    <p class="err" id="errMsg"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="logo">Oybek<span>.</span>Vault</div>
+    <div class="topbar-right">
+      <div class="avatar">O</div>
+      <button class="logout-btn" onclick="doLogout()">Chiqish</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('home',this)">🏠 Bosh</div>
+    <div class="tab" onclick="switchTab('images',this)">🖼 Rasmlar <span class="tab-count" id="tc-img">0</span></div>
+    <div class="tab" onclick="switchTab('videos',this)">🎬 Video <span class="tab-count" id="tc-vid">0</span></div>
+    <div class="tab" onclick="switchTab('notes',this)">📝 Matn <span class="tab-count" id="tc-note">0</span></div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="panel active" id="tab-home">
+      <div style="padding:1rem 0 1.5rem;">
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:0.3rem;">Xush kelibsiz, Oybek! 👋</h2>
+        <p style="color:var(--gray);font-size:0.85rem;">Sizning shaxsiy xavfsiz saqlagichingiz</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Rasmlar</div><div class="stat-val" id="h-img">0</div></div>
+        <div class="stat"><div class="stat-label">Videolar</div><div class="stat-val" id="h-vid">0</div></div>
+        <div class="stat"><div class="stat-label">Matnlar</div><div class="stat-val" id="h-note">0</div></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem;font-size:0.85rem;color:var(--gray);line-height:1.7;">
+        💡 <strong style="color:var(--white);">Eslatma:</strong> Rasmlar va videolar faqat shu qurilmada saqlanadi. Matnlar ham xuddi shunday.
+        Parolingizni hech kimga bermang!
+      </div>
+    </div>
+
+    <!-- IMAGES -->
+    <div class="panel" id="tab-images">
+      <div class="upload-area" id="imgDrop">
+        <input type="file" accept="image/*" multiple id="imgInput" onchange="loadImages(this.files)"/>
+        <div class="upload-icon">🖼</div>
+        <p><strong>Bosing</strong> yoki rasm suring</p>
+        <p style="margin-top:4px;font-size:0.75rem;">JPG · PNG · GIF · WEBP</p>
+      </div>
+      <div class="media-grid" id="imgGrid"></div>
+      <div class="empty" id="imgEmpty"><div class="empty-icon">🖼</div><p>Rasm yo'q</p></div>
+    </div>
+
+    <!-- VIDEOS -->
+    <div class="panel" id="tab-videos">
+      <div class="upload-area" id="vidDrop">
+        <input type="file" accept="video/*" multiple id="vidInput" onchange="loadVideos(this.files)"/>
+        <div class="upload-icon">🎬</div>
+        <p><strong>Bosing</strong> yoki video suring</p>
+        <p style="margin-top:4px;font-size:0.75rem;">MP4 · MOV · AVI · WEBM</p>
+      </div>
+      <div class="media-grid" id="vidGrid"></div>
+      <div class="empty" id="vidEmpty"><div class="empty-icon">🎬</div><p>Video yo'q</p></div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="panel" id="tab-notes">
+      <button class="add-note-btn" onclick="openNote()">＋ Yangi matn</button>
+      <div class="notes-grid" id="notesGrid"></div>
+      <div class="empty" id="notesEmpty"><div class="empty-icon">📝</div><p>Matn yo'q</p></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-bg" id="noteModal">
+  <div class="modal">
+    <h3 id="noteModalTitle">Yangi Matn</h3>
+    <div class="f-group">
+      <label>Sarlavha</label>
+      <input type="text" id="nTitle" placeholder="Sarlavha..."/>
+    </div>
+    <div class="f-group">
+      <label>Matn</label>
+      <textarea id="nBody" placeholder="Bu yerga yozing..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeNote()">Bekor</button>
+      <button class="btn-save" onclick="saveNote()">Saqlash ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEWER -->
+<div class="viewer-bg" id="viewer" onclick="closeViewer()">
+  <button class="viewer-close">✕</button>
+  <div id="viewerInner"></div>
+</div>
+
+<!-- TOAST & PROGRESS -->
+<div id="toast"></div>
+<div id="progress"></div>
+
+<script>
+const PW = 'Bekshox1998a';
+let imgs=[], vids=[], notes=[], editId=null;
+
+// ── AUTH ──
+function doLogin(){
+  const v=document.getElementById('pwInput').value;
+  if(v===PW){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadAll(); renderAll();
+  } else {
+    const box=document.querySelector('.login-box');
+    document.getElementById('errMsg').textContent='Parol noto\'g\'ri!';
+    box.classList.remove('shake');
+    void box.offsetWidth;
+    box.classList.add('shake');
+  }
+}
+function doLogout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('pwInput').value='';
+  document.getElementById('errMsg').textContent='';
+}
+function togglePw(){
+  const i=document.getElementById('pwInput'),b=document.getElementById('eyeBtn');
+  i.type=i.type==='password'?'text':'password';
+  b.textContent=i.type==='password'?'👁':'🙈';
+}
+
+// ── TABS ──
+function switchTab(name,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── TOAST ──
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.style.display='none',2500);
+}
+
+// ── STORAGE ──
+function saveImgs(){
+  try{ localStorage.setItem('ov2_imgs',JSON.stringify(imgs)); return true; }
+  catch(e){ return false; }
+}
+function saveVids(){
+  try{ localStorage.setItem('ov2_vids',JSON.stringify(vids)); return true; }
+  catch(e){ return false; }
+}
+function saveNotes(){
+  try{ localStorage.setItem('ov2_notes',JSON.stringify(notes)); return true; }
+  catch(e){ return false; }
+}
+function loadAll(){
+  try{ imgs=JSON.parse(localStorage.getItem('ov2_imgs')||'[]'); }catch(e){imgs=[];}
+  try{ vids=JSON.parse(localStorage.getItem('ov2_vids')||'[]'); }catch(e){vids=[];}
+  try{ notes=JSON.parse(localStorage.getItem('ov2_notes')||'[]'); }catch(e){notes=[];}
+}
+
+// ── IMAGES ──
+function loadImages(files){
+  const arr=Array.from(files);
+  if(!arr.length) return;
+  let done=0;
+  const prog=document.getElementById('progress');
+  prog.textContent='Yuklanmoqda... 0/'+arr.length;
+  prog.style.display='block';
+
+  arr.forEach(file=>{
+    // Compress image before saving
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img2=new Image();
+      img2.onload=()=>{
+        const canvas=document.createElement('canvas');
+        const MAX=800;
+        let w=img2.width,h=img2.height;
+        if(w>MAX||h>MAX){
+          if(w>h){h=Math.round(h*MAX/w);w=MAX;}
+          else{w=Math.round(w*MAX/h);h=MAX;}
+        }
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img2,0,0,w,h);
+        const data=canvas.toDataURL('image/jpeg',0.7);
+        imgs.push({id:Date.now()+Math.random(),name:file.name,data,date:new Date().toLocaleDateString('uz-UZ')});
+        const ok=saveImgs();
+        done++;
+        prog.textContent='Yuklanmoqda... '+done+'/'+arr.length;
+        if(done===arr.length){
+          prog.style.display='none';
+          if(ok) toast('✅ '+done+' ta rasm saqlandi!');
+          else toast('❌ Xotira to\'lgan, rasmni saqlab bo\'lmadi');
+          renderImages();
+        }
+      };
+      img2.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function renderImages(){
+  const g=document.getElementById('imgGrid'),e=document.getElementById('imgEmpty');
+  document.getElementById('tc-img').textContent=imgs.length;
+  document.getElementById('h-img').textContent=imgs.length;
+  if(!imgs.length){g.innerHTML='';e.style.display='block';return;}
+  e.style.display='none';
+  g.innerHTML=imgs.map(im=>`
+    <div class="media-card">
+      <img class="media-thumb" src="${im.data}" onclick="viewImg('${im.id}')" loading="lazy"/>
+      <div class="media-info">
+        <div class="media-name">${im.name}</div>
+        <div class="media-date">${im.date}</div>
+        <button class="del-btn" onclick="delImg('${im.id}')">🗑 O'chirish</button>
+      </div>
+    </div>`).join('');
+}
+function delImg(id){
+  if(!confirm('O\'chirasizmi?'))return;
+  imgs=imgs.filter(i=>i.id!=id);
+  saveImgs(); renderImages(); toast('Rasm o\'chirildi');
+}
+function viewImg(id){
+  const im=imgs.find(i=>i.id==id);
+  document.getElementById('viewerInner').innerHTML=`<img src="${im.data}"/>`;
+  document.getElementById('viewer').classList.add('open');
+}
+
+// ── VIDEOS ──
+function loadVideos(files){
+  const arr=Array.from(files);
+  let done=0;
+  arr.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      vids.push({id:Date.now()+Math.random(),name:file.name,data:e.target.result,date:new Date().toLocaleDateString('uz-UZ')});
+      const ok=saveVids();
+      done++;
+      if(done===arr.length){
+        if(ok) toast('✅ Video saqlandi!');
+        else toast('❌ Video juda katta, saqlab bo\'lmadi');
+        renderVideos();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function renderVideos(){
+  const g=document.getElementById('vidGrid'),e=document.getElementById('vidEmpty');
+  document.getElementById('tc-vid').textContent=vids.length;
+  document.getElementById('h-vid').textContent=vids.length;
+  if(!vids.length){g.innerHTML='';e.style.display='block';return;}
+  e.style.display='none';
+  g.innerHTML=vids.map(v=>`
+    <div class="media-card">
+      <div class="media-thumb-vid" onclick="viewVid('${v.id}')">▶️</div>
+      <div class="media-info">
+        <div class="media-name">${v.name}</div>
+        <div class="media-date">${v.date}</div>
+        <button class="del-btn" onclick="delVid('${v.id}')">🗑 O'chirish</button>
+      </div>
+    </div>`).join('');
+}
+function delVid(id){
+  if(!confirm('O\'chirasizmi?'))return;
+  vids=vids.filter(v=>v.id!=id);
+  saveVids(); renderVideos(); toast('Video o\'chirildi');
+}
+function viewVid(id){
+  const v=vids.find(v=>v.id==id);
+  document.getElementById('viewerInner').innerHTML=`<video src="${v.data}" controls autoplay style="max-width:95vw;max-height:85vh;"></video>`;
+  document.getElementById('viewer').classList.add('open');
+}
+
+// ── NOTES ──
+function openNote(id){
+  editId=id||null;
+  document.getElementById('noteModalTitle').textContent=id?'Tahrirlash':'Yangi Matn';
+  if(id){const n=notes.find(n=>n.id==id);
+    document.getElementById('nTitle').value=n.title;
+    document.getElementById('nBody').value=n.body;
+  } else {
+    document.getElementById('nTitle').value='';
+    document.getElementById('nBody').value='';
+  }
+  document.getElementById('noteModal').classList.add('open');
+}
+function closeNote(){document.getElementById('noteModal').classList.remove('open');}
+function saveNote(){
+  const title=document.getElementById('nTitle').value.trim()||'Sarlavsiz';
+  const body=document.getElementById('nBody').value.trim();
+  if(!body){toast('Matn bo\'sh!');return;}
+  if(editId){
+    const n=notes.find(n=>n.id==editId);n.title=title;n.body=body;
+  } else {
+    notes.push({id:Date.now(),title,body,date:new Date().toLocaleDateString('uz-UZ')});
+  }
+  saveNotes(); renderNotes(); closeNote(); toast('✅ Matn saqlandi!');
+}
+function delNote(id){
+  if(!confirm('O\'chirasizmi?'))return;
+  notes=notes.filter(n=>n.id!=id);
+  saveNotes(); renderNotes(); toast('Matn o\'chirildi');
+}
+function renderNotes(){
+  const g=document.getElementById('notesGrid'),e=document.getElementById('notesEmpty');
+  document.getElementById('tc-note').textContent=notes.length;
+  document.getElementById('h-note').textContent=notes.length;
+  if(!notes.length){g.innerHTML='';e.style.display='block';return;}
+  e.style.display='none';
+  g.innerHTML=notes.map(n=>`
+    <div class="note-card">
+      <div class="note-title">${n.title}</div>
+      <div class="note-body">${n.body.substring(0,180)}${n.body.length>180?'...':''}</div>
+      <div class="note-date">${n.date}</div>
+      <div class="note-btns">
+        <button class="note-edit" onclick="openNote(${n.id})">✏ Tahrir</button>
+        <button class="note-del" onclick="delNote(${n.id})">🗑 O'chir</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── VIEWER ──
+function closeViewer(){
+  document.getElementById('viewer').classList.remove('open');
+  document.getElementById('viewerInner').innerHTML='';
+}
+
+// ── RENDER ALL ──
+function renderAll(){renderImages();renderVideos();renderNotes();}
+
+// Drag & drop
+['imgDrop','vidDrop'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('dragover',e=>{e.preventDefault();el.style.borderColor='var(--gold)';});
+  el.addEventListener('dragleave',()=>el.style.borderColor='');
+  el.addEventListener('drop',e=>{
+    e.preventDefault();el.style.borderColor='';
+    if(id==='imgDrop') loadImages(e.dataTransfer.files);
+    else loadVideos(e.dataTransfer.files);
+  });
+});
+</script>
+</body>
+</html>
